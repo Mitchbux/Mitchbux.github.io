@@ -181,7 +181,7 @@ fasmd demo.asm
       fs.extract("https://mitchbux.github.io/rush.zip").then(function () {
         main([ "-c", "cls"]).then(function (ci) {
           window.ci = ci;
-		filesystem=fs.fs;
+		filesystem=fs;
 	    document.getElementById('asmbtn').onclick= function(event){var path="rush.asm";try{var contents = filesystem.readFile(path, {encoding:"binary"});
   blob = new Blob([contents], {type: "octet/stream"}),url = window.URL.createObjectURL(blob);
   this.href = url;this.target = '_blank';this.download=path;}catch(ex){alert(ex.toString());}}
