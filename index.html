@@ -4,7 +4,7 @@
 <script type="text/javascript">
 
 var background="jump.mp4";
-var poster="289658.jpg";
+var poster="Pose.jpg";
 var msgs =[" Starting ...",];
 var loader= [" ::: /  / :::", "type DEMO", "press [esc] to exit"];
 var font="https://fonts.gstatic.com/s/jura/v14/z7NOdRfiaC4Vd8hhoPzfb5vBTP266pumR_g.woff2";
@@ -17,10 +17,10 @@ var s=["attribute vec2 a; varying vec2 coord; void main(){gl_Position = vec4(a, 
 " uniform float pindex; uniform float winr; \n" +
 
 "void main() {  vec4 image,text,pixel,window; vec2 i = vec2(coord.x, coord.y); vec2 w;"+
-" if((coord.x*2.0-0.5)<0.0){w=vec2(0.0,0.0); window = vec4(0.0,0.0,0.0,0.0);} else "+
-" if((coord.y*2.0)-0.5<0.0){w=vec2(0.0,0.0); window = vec4(0.0,0.0,0.0,0.0);} else "+       
-" if((coord.x*2.0-0.5)>1.0){w=vec2(0.0,0.0); window = vec4(0.0,0.0,0.0,0.0);} else "+
-" if((coord.y*2.0)-0.5>1.0){w=vec2(0.0,0.0); window = vec4(0.0,0.0,0.0,0.0);} else "+       
+" if((coord.x*2.0-0.5)<0.0){w=vec2(0.0,0.0); window = vec4(1.0,1.0,1.0,1.0);} else "+
+" if((coord.y*2.0)-0.5<0.0){w=vec2(0.0,0.0); window = vec4(1.0,1.0,1.0,1.0);} else "+       
+" if((coord.x*2.0-0.5)>1.0){w=vec2(0.0,0.0); window = vec4(1.0,1.0,1.0,1.0);} else "+
+" if((coord.y*2.0)-0.5>1.0){w=vec2(0.0,0.0); window = vec4(1.0,1.0,1.0,1.0);} else "+       
  " { w=vec2(coord.x*2.0-0.5,(coord.y*2.0)-0.5); window=texture2D(cnv,w); }"+
 " if (winr<1.)image=texture2D(bkg,w); else image=texture2D(bkg,vec2(i.x/winr,i.y)); text=texture2D(txt,i); "+
 //text effects
