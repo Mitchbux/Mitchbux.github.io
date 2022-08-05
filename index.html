@@ -33,7 +33,7 @@ var s=["attribute vec2 a; varying vec2 coord; void main(){gl_Position = vec4(a, 
 
 //application
 
-"pixel=(image*0.2)+(window*0.2)+(text+emboss-0.2)*(text);"+
+"pixel=(image*0.2)+(window)+(text+emboss-0.2)*(text);"+
 //"if(text.r!=0.6 || text.g!=0.6 || text.b!=0.6)pixel=(image+darkening)*0.3;"+
 //list selection
 //"if(i.y>(pindex/40.)&&i.y<((pindex+1.)/40.))"+
@@ -152,18 +152,6 @@ a {color:#fff; font-size:10px;}
 a:visited {color: #ddd;}
 div.dosbox-container + button {display:none;}
 </style>
-<div id="download">
-	 :: <a href="http://tiny.cc/csdget">csd</a> :: <a href="#RUSH.ASM" id="asmbtn">rush.asm</a> :: <a href="#DEMO.COM" id="combtn">rush.com</a> ::
-</div>	
-<b>For faster experience</b><br/>
-<!-- Download :::/ <a href="http://dl.free.fr/qm9wyIOj9">WholeOS</a> /::: for VirtualBox <br/> -->
-Download :::/ <a href="http://dl.free.fr/hb3VhzT2a">WholeOS</a> /::: for VirtualBox <br/>
-<i>Make a clone of the virtual machine then start [MS-DOS].</i><br/><br/>
-<div class="code"><pre>
-cd User
-fasmd demo.asm
-</pre></div><br/>
-[F2] save [F9] run [ESC] quit
 
 <audio id="audio1" src="oOne.flac"></audio>
 <audio id="audio2" src="oTwo.flac"/></audio>	
@@ -182,12 +170,7 @@ fasmd demo.asm
         main([ "-c", "cls"]).then(function (ci) {
           window.ci = ci;
 		filesystem=fs;
-	    document.getElementById('asmbtn').onclick= function(event){var path="rush.asm";try{var contents = filesystem.readFile(path, {encoding:"binary"});
-  blob = new Blob([contents], {type: "octet/stream"}),url = window.URL.createObjectURL(blob);
-  this.href = url;this.target = '_blank';this.download=path;}catch(ex){alert(ex.toString());}}
-	    document.getElementById('combtn').onclick= function(event){var path="DEMO.COM";try{var contents = filesystem.readFile(path, {encoding:"binary"});
-  blob = new Blob([contents], {type: "octet/stream"}),url = window.URL.createObjectURL(blob);
-  this.href = url;this.target = '_blank';this.download=path;}catch(ex){alert(ex.toString());}}
+	    
         });
       });
     });
