@@ -33,7 +33,7 @@ var s=["attribute vec2 a; varying vec2 coord; void main(){gl_Position = vec4(a, 
 
 //application
 
-"pixel=(image*0.6)+(window*0.4)+(text+emboss-0.2)*(text);"+
+"pixel=(image*0.2)+(window*0.2)+(text+emboss-0.2)*(text);"+
 //"if(text.r!=0.6 || text.g!=0.6 || text.b!=0.6)pixel=(image+darkening)*0.3;"+
 //list selection
 //"if(i.y>(pindex/40.)&&i.y<((pindex+1.)/40.))"+
@@ -122,8 +122,8 @@ if (started==0){
 		
 }
 //label
-var ttle=window.orientation ? 10 : 15;
-var subt=window.orientation ? 5  : 8;
+var ttle=window.orientation ? 30 : 35;
+var subt=window.orientation ? 20  : 25;
   ctx.beginPath();  ctx.strokeStyle="#eee";  ctx.lineWidth=1;
   ctx.moveTo(0,el.height*0.73);ctx.lineTo(el.width,el.height*0.73);
   ctx.closePath();  ctx.stroke();
