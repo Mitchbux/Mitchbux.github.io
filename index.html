@@ -46,7 +46,7 @@ var tc=d.createElement("canvas");tc.style="display:none";d.body.style="padding:0
 var bkg=d.createElement("video");src=d.createElement("source");bkg.style="width:1px;height:1px;display:none";bkg.appendChild(src);src.src=background;bkg.loop=true;
 var imz=d.createElement("img");imz.src=poster;imz.style="display:none";
 el=cn("120");d.body.insertBefore(bkg,el);d.body.appendChild(imz); var ht=cn("1"),gl=el.getContext("webgl"),ctx=0;
-var iID = setInterval(drawScene, 40); var lines=140; var index=msgs.length;var minline=lines*0.395;var p=0.0;var cnv={};
+var iID = setInterval(drawScene, 40); var lines=60; var index=msgs.length;var minline=lines*0.395;var p=0.0;var cnv={};
 function drawText(str, size, fnt, color, x, y) {ctx.font = size + 'px "'+fnt+'"'; ctx.textBaseline = 'top';ctx.fillStyle = color;ctx.fillText(str, x, y);}
 function drawCircle(x,y,size,color){ ctx.beginPath();ctx.fillStyle=color;ctx.arc(el.width*0.5+x,el.height*0.8+y,size,0,Math.PI*2.0);ctx.fill();}
 function rsz(){el.style.backgroundColor="#000";tc.width = el.width = document.documentElement.clientWidth; tc.height = el.height = document.documentElement.clientHeight;gl.viewport(0, 0, el.width, el.height);ctx = tc.getContext("2d"); ctx.fillStyle="#909090";ctx.fillRect(0,0,el.width,el.height);widgets(ctx);drawScene();}rsz();document.onload = rsz;window.ondeviceorientation = rsz;window.onresize=rsz;
@@ -114,11 +114,11 @@ try{
 var ty=1.5;
 
 if (started==0){
-  for (var m in loader){drawText(loader[m], fsize*10, "nrm","#cecece",30,ty++*(fsize)); if (ty==1.5)ty=2.;}
+  for (var m in loader){drawText(loader[m], fsize, "nrm","#cecece",30,ty++*(fsize)); if (ty==1.5)ty=2.;}
 }else{                  
 		if (msgs.length > 50) msgs = msgs.slice(msgs.length-50);
 		for(var m in msgs)
-		drawText(msgs[m], fsize*10, "nrm","#eee",30,ty++*(fsize)); if (ty==1.5)ty=2.;
+		drawText(msgs[m], fsize, "nrm","#eee",30,ty++*(fsize)); if (ty==1.5)ty=2.;
 		
 }
 //label
