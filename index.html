@@ -1,182 +1,68 @@
+
 <!DOCTYPE html>
-<head></head>
-<body><canvas></canvas>
-<script type="text/javascript">
+<html>
 
-var background="territory.mp4";
-var poster="daim12.jpg";
-var msgs =[" Starting ...",];
-var loader= [" ::: /  / :::", "type DEMO", "press [esc] to exit"];
-var font="https://fonts.gstatic.com/s/jura/v14/z7NOdRfiaC4Vd8hhoPzfb5vBTP266pumR_g.woff2";
-</script>
-<script type="text/javascript" >
-var cn = function(p) {var c=0;b=document;while (c++ < p.length)b = b.childNodes[p[c - 1]];return b;};
-var s=["attribute vec2 a; varying vec2 coord; void main(){gl_Position = vec4(a, 0, 1);coord=(a+1.0)/2.0; }",
-"precision mediump float;\nvarying vec2 coord; uniform sampler2D txt; uniform sampler2D bkg; uniform sampler2D cnv; \n"+
-//list selection
-" uniform float pindex; uniform float winr; \n" +
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oce - Content Creator Links</title>
+  <style>
+    @font-face {
+      font-family: 'code';
+      src: url('https://fonts.gstatic.com/s/play/v19/6aez4K2oVqwIvtU2H70Q13E.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
 
-"void main() {  vec4 image,text,pixel,window; vec2 i = vec2(coord.x, coord.y); vec2 w;"+
-" if((coord.x*2.0-0.5)<0.0){w=vec2(0.0,0.0); window = vec4(0.0,0.0,0.0,1.0);} else "+
-" if((coord.y*2.0)-0.5<0.0){w=vec2(0.0,0.0); window = vec4(0.0,0.0,0.0,1.0);} else "+       
-" if((coord.x*2.0-0.5)>1.0){w=vec2(0.0,0.0); window = vec4(0.0,0.0,0.0,1.0);} else "+
-" if((coord.y*2.0)-0.5>1.0){w=vec2(0.0,0.0); window = vec4(0.0,0.0,0.0,1.0);} else "+       
- " { w=vec2(coord.x*2.0-0.5,(coord.y*2.0)-0.5); window=texture2D(cnv,w); }"+
-" if (winr<1.)image=texture2D(bkg,w); else image=texture2D(bkg,vec2(i.x/winr,i.y)); text=texture2D(txt,i); "+
-//text effects
-"vec4 emboss=0.0- texture2D(txt,vec2(coord.x+0.0016,coord.y+0.0016))*0.1"+
-   "-texture2D(txt,vec2(coord.x+0.0008,coord.y+0.0008))*0.627;"+
-   "+texture2D(txt,vec2(coord.x+0.0032,coord.y+0.0032))*0.45;emboss=emboss*0.1;"+
-//fx
-"vec4 lightening=(clamp(image*sin(i.y*3.14*100.),0.899,1.)+image*0.10+0.2)*0.2;"+
-"float darkening=0.-(0.5-i.x)*(0.5-i.x)*1.8;"+
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'code', sans-serif;
+      background: #000;
+    }
 
-//application
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
 
-"pixel=(image*0.2)+(window)+(text+emboss-0.2)*(text);"+
-//"if(text.r!=0.6 || text.g!=0.6 || text.b!=0.6)pixel=(image+darkening)*0.3;"+
-//list selection
-//"if(i.y>(pindex/40.)&&i.y<((pindex+1.)/40.))"+
-//   "pixel+=lightening;"+
+    #image {
+      display: none;
+    }
 
-"gl_FragColor=pixel;}"];
-   
-var d=document;var st=d.createElement("style");st.appendChild(d.createTextNode("@font-face{font-family:'nrm';src:local('nrm'),url('"+font+"')format('truetype');}"));cn("12").appendChild(st);
-var tc=d.createElement("canvas");tc.style="display:none";d.body.style="padding:0;margin:0;background-color:#000;color:#fefefe;";d.body.appendChild(tc);
-var bkg=d.createElement("video");src=d.createElement("source");bkg.style="width:1px;height:1px;display:none";bkg.appendChild(src);src.src=background;bkg.loop=true;
-var imz=d.createElement("img");imz.src=poster;imz.style="display:none";
-el=cn("120");d.body.insertBefore(bkg,el);d.body.appendChild(imz); var ht=cn("1"),gl=el.getContext("webgl"),ctx=0;
-var iID = setInterval(drawScene, 40); var lines=60; var index=msgs.length;var minline=lines*0.395;var p=0.0;var cnv={};
-function drawText(str, size, fnt, color, x, y) {ctx.font = size + 'px "'+fnt+'"'; ctx.textBaseline = 'top';ctx.fillStyle = color;ctx.fillText(str, x, y);}
-function drawCircle(x,y,size,color){ ctx.beginPath();ctx.fillStyle=color;ctx.arc(el.width*0.5+x,el.height*0.8+y,size,0,Math.PI*2.0);ctx.fill();}
-function rsz(){el.style.backgroundColor="#000";tc.width = el.width = document.documentElement.clientWidth; tc.height = el.height = document.documentElement.clientHeight;gl.viewport(0, 0, el.width, el.height);ctx = tc.getContext("2d"); ctx.fillStyle="#909090";ctx.fillRect(0,0,el.width,el.height);widgets(ctx);drawScene();}rsz();document.onload = rsz;window.ondeviceorientation = rsz;window.onresize=rsz;
-gl.clearColor(0.0, 0.0, 0.0, 1); gl.clear(gl.COLOR_BUFFER_BIT);function sh(g, t, x) {r = g.createShader(t);g.shaderSource(r, x);g.compileShader(r);return r;};vs = sh(gl, gl.VERTEX_SHADER, s[0]); fs = sh(gl, gl.FRAGMENT_SHADER, s[1]);
-var glpr=gl.createProgram();gl.attachShader(glpr, vs);gl.attachShader(glpr, fs);gl.linkProgram(glpr);gl.useProgram(glpr);
-var a=gl.getAttribLocation(glpr, "a"), buffer = gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER, buffer);gl.enableVertexAttribArray(a);gl.vertexAttribPointer(a, 3, gl.FLOAT, false, 0, 0);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,0,-1,1,0,1,-1,0,1,1,0]), gl.STATIC_DRAW);
-function tprm(tex) {gl.bindTexture(gl.TEXTURE_2D, tex);gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);}
-function teximg(tex, img) {gl.bindTexture(gl.TEXTURE_2D, tex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);}
-function unitex(tex, id, i, uni) {gl.activeTexture(id);gl.bindTexture(gl.TEXTURE_2D, tex);gl.uniform1i(gl.getUniformLocation(glpr, uni), i);}
-var started = 0;var tx=[gl.createTexture(), gl.createTexture(), gl.createTexture()];for(var t in tx)tprm(tx[t]);
-var pass=0;function drawScene() {
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
 
-if (started==0){ try{ cnv=d.getElementById('jsdos');
+    .title {
+      position: absolute;
+      top: 2%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      font-weight: 700;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      text-align: center;
+      z-index: 20;
+    }
 
-teximg(tx[0], tc); teximg(tx[1],imz);  teximg(tx[2],cnv);
-
-unitex(tx[0], gl.TEXTURE1, 1, "txt");
-unitex(tx[1], gl.TEXTURE2, 2, "bkg");
-unitex(tx[2], gl.TEXTURE3, 3, "cnv");
-
-gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); } catch(e){console.log(e);}}
-
- 
- //when clicked
- else { try{  	if (true){ //messages
-	var outp = ["::: /  type [DEMO] or [editor demo.asm] then press [enter] / :::","[F2] SAVE","[F4] LOAD","[F7] SEARCH","[F9] RUN (BUILDs .COM)","[ESC]: Quit the program" ]; if (outp.length>msgs.length){index = outp.length; var audio1=d.getElementById("audio1"); audio1.play();
-	for (var m in outp){if (m==0) msgs[m] = " " + outp[m];else msgs[m] = "  " + (outp[m]);}  
-	ctx = tc.getContext("2d"); ctx.fillStyle="#9b9b9b";ctx.fillRect(0,0,el.width,el.height);widgets(ctx); try{bkg.play();} catch(e){e.toString();}}}
-	
- gl.uniform1f(gl.getUniformLocation(glpr, "pindex"), lines-index-1.5);
- gl.uniform1f(gl.getUniformLocation(glpr, "winr"), (el.height/el.width));
- teximg(tx[0], tc); teximg(tx[1],imz); teximg(tx[2],cnv); 
-	
- unitex(tx[0], gl.TEXTURE1, 1, "txt");
- unitex(tx[1], gl.TEXTURE2, 2, "bkg");
- unitex(tx[2], gl.TEXTURE3, 3, "cnv");
- 
- gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);}catch(e){console.log(e);} }}
-
-// APPLICATION	
-
-var app = () =>  { var audio2=d.getElementById("audio2"); audio2.play();
- started = 1; cnv=d.getElementById('jsdos'); ctx = tc.getContext("2d"); ctx.fillStyle="#9b9b9b";ctx.fillRect(0,0,el.width,el.height);widgets(ctx); bkg.play();
-el.ontouchstart = function(e){ cnv=d.getElementById('canvas'); if (e.changedTouches)e.preventDefault();
-ix=((e.changedTouches[0].pageY/el.height)*lines)>>0;
-if (ix<=msgs.length)index = ix; if (index<1)index=1;  rsz();};
-el.onclick = function(e){ix=(((e.pageY/el.height)*lines)>>0)-2;if (ix<=msgs.length)index=ix;if (index<1)index=1; rsz();};}
-
-   // LOADER
-   el.ontouchstart = app;
-   el.onclick = app;     
-   
-   /*strmouse = ["mousemove", "mousedown", "mouseup", "click"];
-   for(var n in strmouse)
-el.addEventListener(strmouse[n] , (e)=>{cnv=d.getElementById('canvas');
-evt = document.createEvent("MouseEvents");
-  evt.initMouseEvent(strmouse[n], true, true, window,
-    0,0,0, (e.clientX/el.width)*cnv.width, (e.clientY/el.height)*cnv.height, false, false, false, false, 0, null);
-  cnv.dispatchEvent(evt); });*/
-   
-function widgets(ctx){var fsize=el.height/lines;
-try{
-//list
-var ty=1.5;
-
-if (started==0){
-  for (var m in loader){drawText(loader[m], fsize, "nrm","#cecece",30,ty++*(fsize)); if (ty==1.5)ty=2.;}
-}else{                  
-		if (msgs.length > 50) msgs = msgs.slice(msgs.length-50);
-		for(var m in msgs)
-		drawText(msgs[m], fsize, "nrm","#eee",30,ty++*(fsize)); if (ty==1.5)ty=2.;
-		
-}
-//label
-var ttle=window.orientation ? 30 : 35;
-var subt=window.orientation ? 20  : 25;
-  ctx.beginPath();  ctx.strokeStyle="#eee";  ctx.lineWidth=1;
-  ctx.moveTo(0,el.height*0.73);ctx.lineTo(el.width,el.height*0.73);
-  ctx.closePath();  ctx.stroke();
-  drawText("Whole (32 bits)",ttle , "nrm", "#3e3e3e", 10, tc.height*0.72-ttle);
-if(started)
-  drawText(msgs[index-1].substring(1), subt, "nrm", "#eee", 20, tc.height*0.735);
-//media keys
-var btnsize=window.orientation ? 40:60, clr="#eee",clz="#909090";
-
-  //right
-//  drawCircle(btnsize*2,0,btnsize+btnsize/10,clr);drawCircle(btnsize*2,0,btnsize,clz);
-  //left
-//  drawCircle(0-btnsize*2,0,btnsize+btnsize/10,clr);drawCircle(0-btnsize*2,0,btnsize,clz);
-  //center
-//  drawCircle(0,0,btnsize*1.3+btnsize/10,clr);drawCircle(0,0,btnsize*1.3,clz);
-}catch(e){e.toString();}
-}
-
-</script>
-<style>
-@font-face{font-family:'dft';src: url('https://fonts.gstatic.com/s/spartan/v1/l7gAbjR61M69yt8Z8w6FZf9WoBxdBrHbuV6JABTPfJqT.woff2');}
-body{color:#d2d5d0;background-color:#202020;font-family: "dft";font-size:14px;}
-node{font-weight:bold;}
-div#download{position: absolute; right: 1em; top: 1em;}
-a {color:#fff; font-size:10px;}
-a:visited {color: #ddd;}
-div.dosbox-container + button {display:none;}
-</style>
-
-<audio id="audio1" src="oOne.flac"></audio>
-<audio id="audio2" src="oTwo.flac"/></audio>	
-<script src="https://js-dos.com/6.22/current/js-dos.js"></script>
- <canvas id="jsdos" style="display:none"></canvas>
-  <button style="position: absolute; right: 1em; top: 1em;" onclick="ci.fullscreen()">Fullscreen</button>
-  <script>
-  	  var filesystem ={};
-	  function dl(path){alert(path);}
-    Dos(document.getElementById("jsdos"), { 
-      wdosboxUrl: "https://js-dos.com/6.22/current/wdosbox.js",
-      cycles: "40000",
-      autolock: true,
-    }).ready(function (fs, main) {
-      fs.extract("https://mitchbux.github.io/rush.zip").then(function () {
-        main([ "-c", "cls"]).then(function (ci) {
-          window.ci = ci;
-		filesystem=fs;
-	    
-        });
-      });
-    });
-  </script>
-
-</body>
-</html>
-
-
+    .editor-container {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 1200px;
