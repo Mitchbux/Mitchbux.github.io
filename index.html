@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Oce - Content Creator Links</title>
+  <title>Code Sake - Javascript sandbox</title>
   <style>
     @font-face {
       font-family: 'code';
@@ -66,3 +66,634 @@
       transform: translateX(-50%);
       width: 90%;
       max-width: 1200px;
+      height: 80%;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      z-index: 20;
+      pointer-events: auto;
+    }
+
+    .editor-wrapper {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .editor-header {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .editor-title {
+      color: white;
+      font-size: 9px;
+      font-weight: 600;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      font-family: 'code', sans-serif;
+    }
+
+    .run-btn, .save-btn {
+      background: #333333;
+      border: 1px solid #666666;
+      padding: 5px 12px;
+      border-radius: 8px;
+      color: white;
+      font-size: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'code', sans-serif;
+      backdrop-filter: blur(10px);
+    }
+
+    .run-btn:hover, .save-btn:hover {
+      background: #666666;
+      border: 1px solid #999999;
+      transform: scale(1.05);
+    }
+
+    .editor {
+      width: 100%;
+      height: calc(100% - 40px);
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-family: 'code', sans-serif;
+      font-size: 9px;
+      line-height: 1.5;
+      padding: 15px;
+      resize: none;
+      white-space: pre;
+      overflow-wrap: normal;
+      overflow-x: auto;
+      tab-size: 2;
+    }
+
+    .editor::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .console-container {
+      height: 200px;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      overflow: hidden;
+    }
+
+    .console-header {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .console-title {
+      color: white;
+      font-size: 9px;
+      font-weight: 600;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      font-family: 'code', sans-serif;
+    }
+
+    .clear-btn {
+      background: #333333;
+      border: 1px solid #666666;
+      padding: 5px 12px;
+      border-radius: 8px;
+      color: white;
+      font-size: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'code', sans-serif;
+      backdrop-filter: blur(10px);
+    }
+
+    .clear-btn:hover {
+      background: #666666;
+      border: 1px solid #999999;
+      transform: scale(1.05);
+    }
+
+    .console-output {
+      height: calc(100% - 40px);
+      padding: 15px;
+      color: #ffffff;
+      font-family: 'code', sans-serif;
+      font-size: 8px;
+      line-height: 1.4;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .console-log {
+      color: #61dafb;
+      margin-bottom: 5px;
+    }
+
+    .console-error {
+      color: #ff6b6b;
+      margin-bottom: 5px;
+    }
+
+    .console-warn {
+      color: #ffd93d;
+      margin-bottom: 5px;
+    }
+
+    
+
+    @media (max-width: 768px) {
+      .title {
+        font-size: clamp(1.2rem, 3vw, 2rem);
+        top: 1%;
+      }
+
+      .editor-container {
+        top: 6%;
+        width: 95%;
+        height: 85%;
+      }
+
+      .editor-title,
+      .console-title {
+        font-size: 8px;
+      }
+
+      .run-btn,
+      .save-btn,
+      .clear-btn {
+        font-size: 7px;
+        padding: 4px 10px;
+      }
+
+      .editor {
+        font-size: 8px;
+      }
+
+      .console-output {
+        font-size: 7px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .editor-container {
+        width: 98%;
+        gap: 0.5rem;
+      }
+
+      .console-container {
+        height: 150px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+  <img id="image" src="background.jpg" crossorigin="anonymous">
+
+  <div class="overlay">
+    <div class="title">Code Sake</div>
+    <div class="editor-container">
+      <div class="editor-wrapper">
+        <div class="editor-header">
+          <span class="editor-title">JavaScript Editor</span>
+          <div style="display: flex; gap: 8px;">
+            <button class="save-btn" onclick="saveCode()">💾 Save</button>
+            <button class="run-btn" onclick="runCode()">▶ Run</button>
+          </div>
+        </div>
+        <div style="position: relative;">
+          <textarea class="editor" id="jsEditor" spellcheck="false" placeholder="// Write your JavaScript code here...
+console.log('Hello, World!');
+
+function factorial(n) {
+  if (n <= 1) return 1;
+  return n * factorial(n - 1);
+}
+
+console.log('Factorial of 5:', factorial(5));"></textarea>
+        </div>
+      </div>
+      
+      <div class="console-container">
+        <div class="console-header">
+          <span class="console-title">Console Output</span>
+          <button class="clear-btn" onclick="clearOutput()">Clear</button>
+        </div>
+        <div class="console-output" id="consoleOutput"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Vertex shader
+    const vertexShaderSource = `
+      attribute vec2 a_position;
+      varying vec2 v_texCoord;
+      void main() {
+          gl_Position = vec4(a_position, 0.0, 1.0);
+          vec2 texCoord = (a_position + 1.0) / 2.0;
+          v_texCoord = vec2(texCoord.x, 1.0 - texCoord.y);
+      }
+    `;
+
+    // Fragment shader with beautiful effects
+    const fragmentShaderSource = `
+      precision mediump float;
+
+      uniform sampler2D u_backgroundTexture;
+      uniform float u_time;
+      uniform vec2 u_resolution;
+
+      varying vec2 v_texCoord;
+
+      // Noise function
+      float noise(vec2 st) {
+          return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+      }
+
+      // Smooth noise
+      float smoothNoise(vec2 st) {
+          vec2 i = floor(st);
+          vec2 f = fract(st);
+
+          float a = noise(i);
+          float b = noise(i + vec2(1.0, 0.0));
+          float c = noise(i + vec2(0.0, 1.0));
+          float d = noise(i + vec2(1.0, 1.0));
+
+          vec2 u = f * f * (3.0 - 2.0 * f);
+
+          return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+      }
+
+      void main() {
+          vec2 uv = v_texCoord;
+
+          // Background image texture
+          vec4 backgroundColor = texture2D(u_backgroundTexture, uv);
+
+          // Color enhancement
+          backgroundColor.rgb *= 1.2;
+          backgroundColor.rgb = pow(backgroundColor.rgb, vec3(1.1));
+
+          // Vignette effect
+          vec2 center = vec2(0.5, 0.5);
+          float dist = distance(uv, center);
+          float vignette = 1.0 - smoothstep(0.3, 0.8, dist);
+
+          // Light particles effect
+          float particles = 0.0;
+          for(int i = 0; i < 5; i++) {
+              float fi = float(i);
+              vec2 particlePos = vec2(
+                  mod(u_time * 0.1 + fi * 0.2, 1.0),
+                  mod(u_time * 0.05 + fi * 0.3, 1.0)
+              );
+              float particleDist = distance(uv, particlePos);
+              particles += 1.0 / (particleDist * 100.0 + 1.0) * 0.1;
+          }
+
+          // Chromatic aberration
+          vec2 offset = vec2(0.002, 0.0);
+          float r = texture2D(u_backgroundTexture, uv + offset).r;
+          float g = texture2D(u_backgroundTexture, uv).g;
+          float b = texture2D(u_backgroundTexture, uv - offset).b;
+
+          vec3 finalColor = vec3(r, g, b);
+          finalColor += particles;
+          finalColor *= vignette;
+
+          // Add subtle glow
+          finalColor += vec3(0.05, 0.1, 0.2) * sin(u_time) * 0.1;
+
+          gl_FragColor = vec4(finalColor, 1.0);
+      }
+    `;
+
+    let canvas, gl, program, backgroundTexture;
+    let backgroundImage;
+    let startTime = Date.now();
+
+    // JavaScript Editor and Console functionality
+    const jsEditor = document.getElementById('jsEditor');
+    const consoleOutput = document.getElementById('consoleOutput');
+    const syntaxHighlight = document.getElementById('syntaxHighlight');
+
+    function initWebGL() {
+      canvas = document.getElementById('canvas');
+      gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+      if (!gl) {
+        console.error('WebGL not supported');
+        return;
+      }
+
+      // Resize canvas
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      // Create shaders
+      const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+      const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+      // Create program
+      program = createProgram(gl, vertexShader, fragmentShader);
+      gl.useProgram(program);
+
+      // Set up geometry
+      setupGeometry();
+
+      // Initialize background image
+      initBackgroundImage();
+    }
+
+    function createShader(gl, type, source) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error('Shader compilation error:', gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+
+      return shader;
+    }
+
+    function createProgram(gl, vertexShader, fragmentShader) {
+      const program = gl.createProgram();
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+      gl.linkProgram(program);
+
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error('Program linking error:', gl.getProgramInfoLog(program));
+        gl.deleteProgram(program);
+        return null;
+      }
+
+      return program;
+    }
+
+    function setupGeometry() {
+      const positions = new Float32Array([
+        -1, -1,
+        1, -1,
+        -1, 1,
+        -1, 1,
+        1, -1,
+        1, 1
+      ]);
+
+      const positionBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+
+      const positionLocation = gl.getAttribLocation(program, 'a_position');
+      gl.enableVertexAttribArray(positionLocation);
+      gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+    }
+
+    function initBackgroundImage() {
+      backgroundImage = document.getElementById('image');
+      backgroundTexture = gl.createTexture();
+      
+      // Create initial fallback texture
+      gl.bindTexture(gl.TEXTURE_2D, backgroundTexture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+        new Uint8Array([20, 30, 50, 255])); // Dark blue fallback
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+      // Function to load texture with image (called only once)
+      function loadBackgroundTexture() {
+        console.log('Loading background image...');
+        gl.bindTexture(gl.TEXTURE_2D, backgroundTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, backgroundImage);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        console.log('Background image loaded successfully');
+      }
+
+      if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
+        // Image already loaded
+        loadBackgroundTexture();
+      } else {
+        // Wait for image to load
+        backgroundImage.onload = loadBackgroundTexture;
+        backgroundImage.onerror = function() {
+          console.log('Error loading background image, using fallback');
+        };
+      }
+
+      // Start animation loop
+      animate();
+    }
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+
+    function animate() {
+      const currentTime = (Date.now() - startTime) * 0.001;
+
+      // Set uniforms
+      const timeLocation = gl.getUniformLocation(program, 'u_time');
+      const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+      const backgroundTextureLocation = gl.getUniformLocation(program, 'u_backgroundTexture');
+
+      gl.uniform1f(timeLocation, currentTime);
+      gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+      gl.uniform1i(backgroundTextureLocation, 0);
+
+      // Bind background texture
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, backgroundTexture);
+
+      // Clear and draw
+      gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      requestAnimationFrame(animate);
+    }
+
+    
+
+    // Console functions
+    function addToConsole(message, type = 'log') {
+      const div = document.createElement('div');
+      div.className = `console-${type}`;
+      
+      // Handle different message types
+      if (typeof message === 'object') {
+        div.textContent = `> ${JSON.stringify(message, null, 2)}`;
+      } else {
+        div.textContent = `> ${String(message)}`;
+      }
+      
+      consoleOutput.appendChild(div);
+      consoleOutput.scrollTop = consoleOutput.scrollHeight;
+      
+      // Also log to browser console for debugging
+      console.log(`Console ${type}:`, message);
+    }
+
+    function clearOutput() {
+      consoleOutput.innerHTML = '';
+    }
+
+    function saveCode() {
+      const code = jsEditor.value;
+      const blob = new Blob([code], { type: 'application/javascript' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'script.js';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      addToConsole('Code saved as script.js', 'log');
+    }
+
+    function runCode() {
+      const code = jsEditor.value.trim();
+      
+      if (!code) {
+        addToConsole('No code to execute', 'warn');
+        return;
+      }
+      
+      // Clear previous output
+      clearOutput();
+      addToConsole('Executing code...', 'log');
+      
+      // Create a sandbox environment with file access
+      const sandboxConsole = {
+        log: (...args) => {
+          const message = args.map(arg => 
+            typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+          ).join(' ');
+          addToConsole(message, 'log');
+        },
+        error: (...args) => {
+          const message = args.map(arg => 
+            typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+          ).join(' ');
+          addToConsole(message, 'error');
+        },
+        warn: (...args) => {
+          const message = args.map(arg => 
+            typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+          ).join(' ');
+          addToConsole(message, 'warn');
+        }
+      };
+
+      // Simple file system simulation
+      const files = {
+        'script.js': '', // You can load actual file contents here
+        'data.txt': 'Sample data content',
+        'config.json': '{"setting1": "value1", "setting2": "value2"}',
+        'background.jpg': '[Binary image file - not readable as text]',
+        'enwik6': 'Large Wikipedia XML dataset file - partial content available',
+        'index.html': document.documentElement.outerHTML
+      };
+
+      const fs = {
+        readFile: (filename) => {
+          if (files[filename] !== undefined) {
+            return files[filename];
+          }
+          throw new Error(`File '${filename}' not found`);
+        },
+        writeFile: (filename, content) => {
+          const readOnlyFiles = ['background.jpg', 'enwik6', 'index.html'];
+          if (readOnlyFiles.includes(filename)) {
+            throw new Error(`File '${filename}' is read-only and cannot be modified`);
+          }
+          files[filename] = content;
+          addToConsole(`File '${filename}' written successfully`, 'log');
+        },
+        listFiles: () => {
+          return Object.keys(files);
+        }
+      };
+      
+      try {
+        // Create a function with the user's code
+        const func = new Function('console', 'fs', 'files', 'return (function() { ' + code + ' })()');
+        const result = func(sandboxConsole, fs, files);
+        
+        // If there's a return value, show it
+        if (result !== undefined) {
+          addToConsole(`Return value: ${typeof result === 'object' ? JSON.stringify(result, null, 2) : result}`, 'log');
+        }
+        
+        addToConsole('Code execution completed', 'log');
+      } catch (error) {
+        addToConsole(`Error: ${error.message}`, 'error');
+        addToConsole(`Stack: ${error.stack}`, 'error');
+      }
+    }
+
+    // Event listeners
+    jsEditor.addEventListener('keydown', function(e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        this.value = this.value.substring(0, start) + '  ' + this.value.substring(end);
+        this.selectionStart = this.selectionEnd = start + 2;
+      }
+      if (e.ctrlKey && e.key === 'Enter') {
+        runCode();
+      }
+    });
+
+    // Initialize when page loads
+    window.addEventListener('load', function() {
+      console.log('Page loaded, initializing WebGL...');
+      initWebGL();
+      
+      // Ensure console output element is ready
+      if (consoleOutput) {
+        // Add some demo content to console
+        setTimeout(() => {
+          addToConsole('JavaScript Editor Ready! Press Ctrl+Enter to run code.', 'log');
+          addToConsole('Try running: console.log("Hello World!");', 'log');
+        }, 1000);
+      } else {
+        console.error('Console output element not found!');
+      }
+    });
+  </script>
+</body>
+</html>
