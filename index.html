@@ -123,7 +123,9 @@
 
     .editor {
       width: 100%;
-      height: calc(100% - 40px);
+      height: 350px;
+      max-height: 350px;
+      min-height: 350px;
       background: transparent;
       border: none;
       outline: none;
@@ -132,15 +134,42 @@
       font-size: 9px;
       line-height: 1.5;
       padding: 15px;
-      resize: none;
+      padding-right: 25px;
+      margin-right: 5px;
       white-space: pre;
       overflow-wrap: normal;
+      overflow-y: scroll;
       overflow-x: auto;
       tab-size: 2;
+      box-sizing: border-box;
+      resize: none;
     }
 
-    .editor::placeholder {
+    .editor:empty:before {
+      content: attr(data-placeholder);
       color: rgba(255, 255, 255, 0.5);
+      pointer-events: none;
+    }
+
+    .editor::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .editor::-webkit-scrollbar-track {
+      background: #333333;
+    }
+
+    .editor::-webkit-scrollbar-thumb {
+      background: #666666;
+      border-radius: 1px;
+    }
+
+    .editor::-webkit-scrollbar-thumb:hover {
+      background: #888888;
+    }
+
+    .editor::-webkit-scrollbar-corner {
+      background: #333333;
     }
 
     .console-container {
@@ -281,7 +310,7 @@
           </div>
         </div>
         <div style="position: relative;">
-          <textarea class="editor" id="jsEditor" spellcheck="false" placeholder="// Write your JavaScript code here...
+          <div class="editor" id="jsEditor" contenteditable="true" spellcheck="false" data-placeholder="// Write your JavaScript code here...
 console.log('Hello, World!');
 
 function factorial(n) {
@@ -289,7 +318,15 @@ function factorial(n) {
   return n * factorial(n - 1);
 }
 
-console.log('Factorial of 5:', factorial(5));"></textarea>
+console.log('Factorial of 5:', factorial(5));">// Write your JavaScript code here...
+console.log('Hello, World!');
+
+function factorial(n) {
+  if (n <= 1) return 1;
+  return n * factorial(n - 1);
+}
+
+console.log('Factorial of 5:', factorial(5));</div>
         </div>
       </div>
       
@@ -575,7 +612,7 @@ console.log('Factorial of 5:', factorial(5));"></textarea>
       
       const reader = new FileReader();
       reader.onload = function(e) {
-        jsEditor.value = e.target.result;
+        jsEditor.textContent = e.target.result;
         addToConsole(`File '${file.name}' loaded successfully`, 'log');
       };
       
@@ -587,7 +624,7 @@ console.log('Factorial of 5:', factorial(5));"></textarea>
     }
 
     function saveCode() {
-      const code = jsEditor.value;
+      const code = jsEditor.textContent;
       const blob = new Blob([code], { type: 'application/javascript' });
       const url = URL.createObjectURL(blob);
       
@@ -603,7 +640,7 @@ console.log('Factorial of 5:', factorial(5));"></textarea>
     }
 
     function runCode() {
-      const code = jsEditor.value.trim();
+      const code = jsEditor.textContent.trim();
       
       if (!code) {
         addToConsole('No code to execute', 'warn');
@@ -687,20 +724,28 @@ console.log('Factorial of 5:', factorial(5));"></textarea>
     jsEditor.addEventListener('keydown', function(e) {
       if (e.key === 'Tab') {
         e.preventDefault();
-        const start = this.selectionStart;
-        const end = this.selectionEnd;
-        this.value = this.value.substring(0, start) + '  ' + this.value.substring(end);
-        this.selectionStart = this.selectionEnd = start + 2;
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const tabNode = document.createTextNode('  ');
+        range.insertNode(tabNode);
+        range.setStartAfter(tabNode);
+        range.setEndAfter(tabNode);
+        selection.removeAllRanges();
+        selection.addRange(range);
       }
       if (e.ctrlKey && e.key === 'Enter') {
         runCode();
       }
     });
 
+    
+
     // Initialize when page loads
     window.addEventListener('load', function() {
       console.log('Page loaded, initializing WebGL...');
       initWebGL();
+      
+      
       
       // Ensure console output element is ready
       if (consoleOutput) {
