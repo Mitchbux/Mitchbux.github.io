@@ -274,6 +274,8 @@
         <div class="editor-header">
           <span class="editor-title">JavaScript Editor</span>
           <div style="display: flex; gap: 8px;">
+            <input type="file" id="fileInput" style="display: none;" accept=".js,.txt,.json,.html,.css,.py,.java,.cpp,.c,.md" onchange="openFile(event)">
+            <button class="save-btn" onclick="document.getElementById('fileInput').click()">📂 Open</button>
             <button class="save-btn" onclick="saveCode()">💾 Save</button>
             <button class="run-btn" onclick="runCode()">▶ Run</button>
           </div>
@@ -565,6 +567,23 @@ console.log('Factorial of 5:', factorial(5));"></textarea>
 
     function clearOutput() {
       consoleOutput.innerHTML = '';
+    }
+
+    function openFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        jsEditor.value = e.target.result;
+        addToConsole(`File '${file.name}' loaded successfully`, 'log');
+      };
+      
+      reader.onerror = function() {
+        addToConsole(`Error loading file '${file.name}'`, 'error');
+      };
+      
+      reader.readAsText(file);
     }
 
     function saveCode() {
