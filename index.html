@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 
@@ -64,8 +63,6 @@
       top: 8%;
       left: 50%;
       transform: translateX(-50%);
-      width: 90%;
-      max-width: 1200px;
       height: 80%;
       display: flex;
       flex-direction: column;
@@ -79,9 +76,9 @@
       background: rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(15px);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 15px;
-      overflow: hidden;
       position: relative;
+      max-width: 1200px;
+      max-height: 300px;
     }
 
     .editor-header {
@@ -101,7 +98,8 @@
       font-family: 'code', sans-serif;
     }
 
-    .run-btn, .save-btn {
+    .run-btn,
+    .save-btn {
       background: #333333;
       border: 1px solid #666666;
       padding: 5px 12px;
@@ -115,17 +113,14 @@
       backdrop-filter: blur(10px);
     }
 
-    .run-btn:hover, .save-btn:hover {
+    .run-btn:hover,
+    .save-btn:hover {
       background: #666666;
       border: 1px solid #999999;
       transform: scale(1.05);
     }
 
     .editor {
-      width: 100%;
-      height: 350px;
-      max-height: 350px;
-      min-height: 350px;
       background: transparent;
       border: none;
       outline: none;
@@ -137,12 +132,16 @@
       padding-right: 25px;
       margin-right: 5px;
       white-space: pre;
-      overflow-wrap: normal;
-      overflow-y: scroll;
-      overflow-x: auto;
-      tab-size: 2;
-      box-sizing: border-box;
-      resize: none;
+      tab-size: 4;
+      width: 1200px;
+      height: 100%;
+    }
+
+    .editor-placeholder {
+      position: relative;
+      display: flex;
+      height: 88%;
+      overflow: auto;
     }
 
     .editor:empty:before {
@@ -151,24 +150,25 @@
       pointer-events: none;
     }
 
-    .editor::-webkit-scrollbar {
+    .editor-placeholder::-webkit-scrollbar {
       width: 3px;
+      height: 3px;
     }
 
-    .editor::-webkit-scrollbar-track {
+    .editor-placeholder::-webkit-scrollbar-track {
       background: #333333;
     }
 
-    .editor::-webkit-scrollbar-thumb {
+    .editor-placeholder::-webkit-scrollbar-thumb {
       background: #666666;
       border-radius: 1px;
     }
 
-    .editor::-webkit-scrollbar-thumb:hover {
+    .editor-placeholder::-webkit-scrollbar-thumb:hover {
       background: #888888;
     }
 
-    .editor::-webkit-scrollbar-corner {
+    .editor-placeholder::-webkit-scrollbar-corner {
       background: #333333;
     }
 
@@ -177,7 +177,6 @@
       background: rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(15px);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 15px;
       overflow: hidden;
     }
 
@@ -229,6 +228,27 @@
       white-space: pre-wrap;
     }
 
+    .console-output::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    .console-output::-webkit-scrollbar-track {
+      background: #333333;
+    }
+
+    .console-output::-webkit-scrollbar-thumb {
+      background: #666666;
+      border-radius: 1px;
+    }
+
+    .console-output::-webkit-scrollbar-thumb:hover {
+      background: #888888;
+    }
+
+    .console-output::-webkit-scrollbar-corner {
+      background: #333333;
+    }
+
     .console-log {
       color: #61dafb;
       margin-bottom: 5px;
@@ -244,7 +264,7 @@
       margin-bottom: 5px;
     }
 
-    
+
 
     @media (max-width: 768px) {
       .title {
@@ -303,13 +323,14 @@
         <div class="editor-header">
           <span class="editor-title">JavaScript Editor</span>
           <div style="display: flex; gap: 8px;">
-            <input type="file" id="fileInput" style="display: none;" accept=".js,.txt,.json,.html,.css,.py,.java,.cpp,.c,.md" onchange="openFile(event)">
+            <input type="file" id="fileInput" style="display: none;"
+              accept=".js,.txt,.json,.html,.css,.py,.java,.cpp,.c,.md" onchange="openFile(event)">
             <button class="save-btn" onclick="document.getElementById('fileInput').click()">📂 Open</button>
             <button class="save-btn" onclick="saveCode()">💾 Save</button>
             <button class="run-btn" onclick="runCode()">▶ Run</button>
           </div>
         </div>
-        <div style="position: relative;">
+        <div class="editor-placeholder">
           <div class="editor" id="jsEditor" contenteditable="true" spellcheck="false" data-placeholder="// Write your JavaScript code here...
 console.log('Hello, World!');
 
@@ -318,18 +339,10 @@ function factorial(n) {
   return n * factorial(n - 1);
 }
 
-console.log('Factorial of 5:', factorial(5));">// Write your JavaScript code here...
-console.log('Hello, World!');
-
-function factorial(n) {
-  if (n <= 1) return 1;
-  return n * factorial(n - 1);
-}
-
-console.log('Factorial of 5:', factorial(5));</div>
+console.log('Factorial of 5:', factorial(5));"></div>
         </div>
       </div>
-      
+
       <div class="console-container">
         <div class="console-header">
           <span class="console-title">Console Output</span>
@@ -514,7 +527,7 @@ console.log('Factorial of 5:', factorial(5));</div>
     function initBackgroundImage() {
       backgroundImage = document.getElementById('image');
       backgroundTexture = gl.createTexture();
-      
+
       // Create initial fallback texture
       gl.bindTexture(gl.TEXTURE_2D, backgroundTexture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
@@ -542,7 +555,7 @@ console.log('Factorial of 5:', factorial(5));</div>
       } else {
         // Wait for image to load
         backgroundImage.onload = loadBackgroundTexture;
-        backgroundImage.onerror = function() {
+        backgroundImage.onerror = function () {
           console.log('Error loading background image, using fallback');
         };
       }
@@ -581,23 +594,23 @@ console.log('Factorial of 5:', factorial(5));</div>
       requestAnimationFrame(animate);
     }
 
-    
+
 
     // Console functions
     function addToConsole(message, type = 'log') {
       const div = document.createElement('div');
       div.className = `console-${type}`;
-      
+
       // Handle different message types
       if (typeof message === 'object') {
         div.textContent = `> ${JSON.stringify(message, null, 2)}`;
       } else {
         div.textContent = `> ${String(message)}`;
       }
-      
+
       consoleOutput.appendChild(div);
       consoleOutput.scrollTop = consoleOutput.scrollHeight;
-      
+
       // Also log to browser console for debugging
       console.log(`Console ${type}:`, message);
     }
@@ -609,25 +622,25 @@ console.log('Factorial of 5:', factorial(5));</div>
     function openFile(event) {
       const file = event.target.files[0];
       if (!file) return;
-      
+
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         jsEditor.textContent = e.target.result;
         addToConsole(`File '${file.name}' loaded successfully`, 'log');
       };
-      
-      reader.onerror = function() {
+
+      reader.onerror = function () {
         addToConsole(`Error loading file '${file.name}'`, 'error');
       };
-      
+
       reader.readAsText(file);
     }
 
     function saveCode() {
       const code = jsEditor.textContent;
-      const blob = new Blob([code], { type: 'application/javascript' });
+      const blob = new Blob([code], {type: 'application/javascript'});
       const url = URL.createObjectURL(blob);
-      
+
       const a = document.createElement('a');
       a.href = url;
       a.download = 'script.js';
@@ -635,38 +648,38 @@ console.log('Factorial of 5:', factorial(5));</div>
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
+
       addToConsole('Code saved as script.js', 'log');
     }
 
     function runCode() {
       const code = jsEditor.textContent.trim();
-      
+
       if (!code) {
         addToConsole('No code to execute', 'warn');
         return;
       }
-      
+
       // Clear previous output
       clearOutput();
       addToConsole('Executing code...', 'log');
-      
+
       // Create a sandbox environment with file access
       const sandboxConsole = {
         log: (...args) => {
-          const message = args.map(arg => 
+          const message = args.map(arg =>
             typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
           ).join(' ');
           addToConsole(message, 'log');
         },
         error: (...args) => {
-          const message = args.map(arg => 
+          const message = args.map(arg =>
             typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
           ).join(' ');
           addToConsole(message, 'error');
         },
         warn: (...args) => {
-          const message = args.map(arg => 
+          const message = args.map(arg =>
             typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
           ).join(' ');
           addToConsole(message, 'warn');
@@ -702,17 +715,17 @@ console.log('Factorial of 5:', factorial(5));</div>
           return Object.keys(files);
         }
       };
-      
+
       try {
         // Create a function with the user's code
         const func = new Function('console', 'fs', 'files', 'return (function() { ' + code + ' })()');
         const result = func(sandboxConsole, fs, files);
-        
+
         // If there's a return value, show it
         if (result !== undefined) {
           addToConsole(`Return value: ${typeof result === 'object' ? JSON.stringify(result, null, 2) : result}`, 'log');
         }
-        
+
         addToConsole('Code execution completed', 'log');
       } catch (error) {
         addToConsole(`Error: ${error.message}`, 'error');
@@ -721,12 +734,12 @@ console.log('Factorial of 5:', factorial(5));</div>
     }
 
     // Event listeners
-    jsEditor.addEventListener('keydown', function(e) {
+    jsEditor.addEventListener('keydown', function (e) {
       if (e.key === 'Tab') {
         e.preventDefault();
         const selection = window.getSelection();
         const range = selection.getRangeAt(0);
-        const tabNode = document.createTextNode('  ');
+        const tabNode = document.createTextNode('    ');
         range.insertNode(tabNode);
         range.setStartAfter(tabNode);
         range.setEndAfter(tabNode);
@@ -738,15 +751,15 @@ console.log('Factorial of 5:', factorial(5));</div>
       }
     });
 
-    
+
 
     // Initialize when page loads
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
       console.log('Page loaded, initializing WebGL...');
       initWebGL();
-      
-      
-      
+
+
+
       // Ensure console output element is ready
       if (consoleOutput) {
         // Add some demo content to console
@@ -760,4 +773,5 @@ console.log('Factorial of 5:', factorial(5));</div>
     });
   </script>
 </body>
+
 </html>
