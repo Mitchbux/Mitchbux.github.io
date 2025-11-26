@@ -4,7 +4,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Mitchbux">
+  <meta name="copyright" content="Copyright 2025 Mitchbux. All rights reserved.">
+  <meta name="description" content="Code Sake - A JavaScript sandbox environment for testing and running code">
+  <meta name="keywords" content="javascript, sandbox, code editor, online ide">
   <title>Code Sake - Javascript sandbox</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23000'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' fill='%2361dafb' font-family='monospace'%3E%7B%7D%3C/text%3E%3C/svg%3E">
   <style>
     @font-face {
       font-family: 'code';
@@ -73,12 +78,13 @@
 
     .editor-wrapper {
       flex: 1;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(15px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(97, 218, 251, 0.3);
+      box-shadow: 0 0 20px rgba(97, 218, 251, 0.1);
       position: relative;
       max-width: 1200px;
-      max-height: 300px;
+      max-height: 350px;
     }
 
     .editor-header {
@@ -99,7 +105,8 @@
     }
 
     .run-btn,
-    .save-btn {
+    .save-btn,
+    .add-file-btn {
       background: #333333;
       border: 1px solid #666666;
       padding: 5px 12px;
@@ -114,10 +121,21 @@
     }
 
     .run-btn:hover,
-    .save-btn:hover {
+    .save-btn:hover,
+    .add-file-btn:hover {
       background: #666666;
       border: 1px solid #999999;
       transform: scale(1.05);
+    }
+
+    .add-file-btn {
+      background: #2a5298;
+      border: 1px solid #4a7bc8;
+    }
+
+    .add-file-btn:hover {
+      background: #3a6ab8;
+      border: 1px solid #5a8be8;
     }
 
     .editor {
@@ -128,10 +146,7 @@
       font-family: 'code', sans-serif;
       font-size: 9px;
       line-height: 1.5;
-      padding: 15px;
-      padding-right: 25px;
-      margin-right: 5px;
-      white-space: pre;
+      padding: 0px;
       tab-size: 4;
       width: 1200px;
       height: 100%;
@@ -141,42 +156,14 @@
       position: relative;
       display: flex;
       height: 88%;
-      overflow: auto;
-    }
-
-    .editor:empty:before {
-      content: attr(data-placeholder);
-      color: rgba(255, 255, 255, 0.5);
-      pointer-events: none;
-    }
-
-    .editor-placeholder::-webkit-scrollbar {
-      width: 3px;
-      height: 3px;
-    }
-
-    .editor-placeholder::-webkit-scrollbar-track {
-      background: #333333;
-    }
-
-    .editor-placeholder::-webkit-scrollbar-thumb {
-      background: #666666;
-      border-radius: 1px;
-    }
-
-    .editor-placeholder::-webkit-scrollbar-thumb:hover {
-      background: #888888;
-    }
-
-    .editor-placeholder::-webkit-scrollbar-corner {
-      background: #333333;
     }
 
     .console-container {
       height: 200px;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(15px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(97, 218, 251, 0.3);
+      box-shadow: 0 0 20px rgba(97, 218, 251, 0.1);
       overflow: hidden;
     }
 
@@ -264,8 +251,6 @@
       margin-bottom: 5px;
     }
 
-
-
     @media (max-width: 768px) {
       .title {
         font-size: clamp(1.2rem, 3vw, 2rem);
@@ -284,7 +269,6 @@
       }
 
       .run-btn,
-      .save-btn,
       .clear-btn {
         font-size: 7px;
         padding: 4px 10px;
@@ -321,25 +305,16 @@
     <div class="editor-container">
       <div class="editor-wrapper">
         <div class="editor-header">
-          <span class="editor-title">JavaScript Editor</span>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="editor-title">JavaScript Editor</span>
+          </div>
           <div style="display: flex; gap: 8px;">
-            <input type="file" id="fileInput" style="display: none;"
-              accept=".js,.txt,.json,.html,.css,.py,.java,.cpp,.c,.md" onchange="openFile(event)">
-            <button class="save-btn" onclick="document.getElementById('fileInput').click()">📂 Open</button>
-            <button class="save-btn" onclick="saveCode()">💾 Save</button>
-            <button class="run-btn" onclick="runCode()">▶ Run</button>
+            <button class="run-btn" onclick="runCode()">Run</button>
+            <button class="run-btn" onclick="downloadCode()">Download</button>
           </div>
         </div>
         <div class="editor-placeholder">
-          <div class="editor" id="jsEditor" contenteditable="true" spellcheck="false" data-placeholder="// Write your JavaScript code here...
-console.log('Hello, World!');
-
-function factorial(n) {
-  if (n <= 1) return 1;
-  return n * factorial(n - 1);
-}
-
-console.log('Factorial of 5:', factorial(5));"></div>
+          <iframe src="https://embed.spck.io/?files=1&theme=dracula" class="editor" id="jsEditor" width="100%" frameBorder="0"></iframe>
         </div>
       </div>
 
@@ -353,8 +328,8 @@ console.log('Factorial of 5:', factorial(5));"></div>
     </div>
   </div>
 
+  <script src="https://embed.spck.io/embed/spck-embed.min.js"></script>
   <script>
-    // Vertex shader
     const vertexShaderSource = `
       attribute vec2 a_position;
       varying vec2 v_texCoord;
@@ -365,7 +340,6 @@ console.log('Factorial of 5:', factorial(5));"></div>
       }
     `;
 
-    // Fragment shader with beautiful effects
     const fragmentShaderSource = `
       precision mediump float;
 
@@ -375,12 +349,10 @@ console.log('Factorial of 5:', factorial(5));"></div>
 
       varying vec2 v_texCoord;
 
-      // Noise function
       float noise(vec2 st) {
           return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
       }
 
-      // Smooth noise
       float smoothNoise(vec2 st) {
           vec2 i = floor(st);
           vec2 f = fract(st);
@@ -398,19 +370,15 @@ console.log('Factorial of 5:', factorial(5));"></div>
       void main() {
           vec2 uv = v_texCoord;
 
-          // Background image texture
           vec4 backgroundColor = texture2D(u_backgroundTexture, uv);
 
-          // Color enhancement
           backgroundColor.rgb *= 1.2;
           backgroundColor.rgb = pow(backgroundColor.rgb, vec3(1.1));
 
-          // Vignette effect
           vec2 center = vec2(0.5, 0.5);
           float dist = distance(uv, center);
           float vignette = 1.0 - smoothstep(0.3, 0.8, dist);
 
-          // Light particles effect
           float particles = 0.0;
           for(int i = 0; i < 5; i++) {
               float fi = float(i);
@@ -422,7 +390,6 @@ console.log('Factorial of 5:', factorial(5));"></div>
               particles += 1.0 / (particleDist * 100.0 + 1.0) * 0.1;
           }
 
-          // Chromatic aberration
           vec2 offset = vec2(0.002, 0.0);
           float r = texture2D(u_backgroundTexture, uv + offset).r;
           float g = texture2D(u_backgroundTexture, uv).g;
@@ -432,7 +399,6 @@ console.log('Factorial of 5:', factorial(5));"></div>
           finalColor += particles;
           finalColor *= vignette;
 
-          // Add subtle glow
           finalColor += vec3(0.05, 0.1, 0.2) * sin(u_time) * 0.1;
 
           gl_FragColor = vec4(finalColor, 1.0);
@@ -443,10 +409,10 @@ console.log('Factorial of 5:', factorial(5));"></div>
     let backgroundImage;
     let startTime = Date.now();
 
-    // JavaScript Editor and Console functionality
-    const jsEditor = document.getElementById('jsEditor');
     const consoleOutput = document.getElementById('consoleOutput');
-    const syntaxHighlight = document.getElementById('syntaxHighlight');
+
+    let editor = null;
+    let currentCode = '';
 
     function initWebGL() {
       canvas = document.getElementById('canvas');
@@ -454,25 +420,23 @@ console.log('Factorial of 5:', factorial(5));"></div>
 
       if (!gl) {
         console.error('WebGL not supported');
+        addToConsole('WebGL not supported in this browser', 'error');
         return;
       }
+      
+      console.log('WebGL initialized successfully');
 
-      // Resize canvas
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
 
-      // Create shaders
       const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
       const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 
-      // Create program
       program = createProgram(gl, vertexShader, fragmentShader);
       gl.useProgram(program);
 
-      // Set up geometry
       setupGeometry();
 
-      // Initialize background image
       initBackgroundImage();
     }
 
@@ -528,16 +492,14 @@ console.log('Factorial of 5:', factorial(5));"></div>
       backgroundImage = document.getElementById('image');
       backgroundTexture = gl.createTexture();
 
-      // Create initial fallback texture
       gl.bindTexture(gl.TEXTURE_2D, backgroundTexture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-        new Uint8Array([20, 30, 50, 255])); // Dark blue fallback
+        new Uint8Array([20, 30, 50, 255]));
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
-      // Function to load texture with image (called only once)
       function loadBackgroundTexture() {
         console.log('Loading background image...');
         gl.bindTexture(gl.TEXTURE_2D, backgroundTexture);
@@ -550,17 +512,32 @@ console.log('Factorial of 5:', factorial(5));"></div>
       }
 
       if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
-        // Image already loaded
         loadBackgroundTexture();
       } else {
-        // Wait for image to load
         backgroundImage.onload = loadBackgroundTexture;
         backgroundImage.onerror = function () {
-          console.log('Error loading background image, using fallback');
+          console.log('Error loading background image, using procedural fallback');
+          // Create a procedural gradient as fallback
+          const canvas = document.createElement('canvas');
+          canvas.width = 512;
+          canvas.height = 512;
+          const ctx = canvas.getContext('2d');
+          const gradient = ctx.createLinearGradient(0, 0, 0, 512);
+          gradient.addColorStop(0, '#1a1a2e');
+          gradient.addColorStop(0.5, '#16213e');
+          gradient.addColorStop(1, '#0f3460');
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, 512, 512);
+          
+          gl.bindTexture(gl.TEXTURE_2D, backgroundTexture);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         };
       }
 
-      // Start animation loop
       animate();
     }
 
@@ -573,7 +550,6 @@ console.log('Factorial of 5:', factorial(5));"></div>
     function animate() {
       const currentTime = (Date.now() - startTime) * 0.001;
 
-      // Set uniforms
       const timeLocation = gl.getUniformLocation(program, 'u_time');
       const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
       const backgroundTextureLocation = gl.getUniformLocation(program, 'u_backgroundTexture');
@@ -582,11 +558,9 @@ console.log('Factorial of 5:', factorial(5));"></div>
       gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
       gl.uniform1i(backgroundTextureLocation, 0);
 
-      // Bind background texture
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, backgroundTexture);
 
-      // Clear and draw
       gl.clearColor(0.0, 0.0, 0.0, 1.0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -594,14 +568,10 @@ console.log('Factorial of 5:', factorial(5));"></div>
       requestAnimationFrame(animate);
     }
 
-
-
-    // Console functions
     function addToConsole(message, type = 'log') {
       const div = document.createElement('div');
       div.className = `console-${type}`;
 
-      // Handle different message types
       if (typeof message === 'object') {
         div.textContent = `> ${JSON.stringify(message, null, 2)}`;
       } else {
@@ -610,61 +580,33 @@ console.log('Factorial of 5:', factorial(5));"></div>
 
       consoleOutput.appendChild(div);
       consoleOutput.scrollTop = consoleOutput.scrollHeight;
-
-      // Also log to browser console for debugging
-      console.log(`Console ${type}:`, message);
     }
 
     function clearOutput() {
       consoleOutput.innerHTML = '';
     }
 
-    function openFile(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+    async function runCode() {
+      clearOutput();
 
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        jsEditor.textContent = e.target.result;
-        addToConsole(`File '${file.name}' loaded successfully`, 'log');
-      };
+      let code = currentCode;
+      
+      if (editor) {
+        try {
+          const text = await editor.getText();
+          if (text && text.trim()) {
+            code = text;
+          }
+        } catch (e) {
+          console.log('Could not get text from editor:', e);
+        }
+      }
 
-      reader.onerror = function () {
-        addToConsole(`Error loading file '${file.name}'`, 'error');
-      };
-
-      reader.readAsText(file);
-    }
-
-    function saveCode() {
-      const code = jsEditor.textContent;
-      const blob = new Blob([code], {type: 'application/javascript'});
-      const url = URL.createObjectURL(blob);
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'script.js';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      addToConsole('Code saved as script.js', 'log');
-    }
-
-    function runCode() {
-      const code = jsEditor.textContent.trim();
-
-      if (!code) {
-        addToConsole('No code to execute', 'warn');
+      if (!code || !code.trim()) {
+        addToConsole('No code to run', 'warn');
         return;
       }
 
-      // Clear previous output
-      clearOutput();
-      addToConsole('Executing code...', 'log');
-
-      // Create a sandbox environment with file access
       const sandboxConsole = {
         log: (...args) => {
           const message = args.map(arg =>
@@ -686,90 +628,109 @@ console.log('Factorial of 5:', factorial(5));"></div>
         }
       };
 
-      // Simple file system simulation
-      const files = {
-        'script.js': '', // You can load actual file contents here
-        'data.txt': 'Sample data content',
-        'config.json': '{"setting1": "value1", "setting2": "value2"}',
-        'background.jpg': '[Binary image file - not readable as text]',
-        'enwik6': 'Large Wikipedia XML dataset file - partial content available',
-        'index.html': document.documentElement.outerHTML
-      };
-
-      const fs = {
-        readFile: (filename) => {
-          if (files[filename] !== undefined) {
-            return files[filename];
-          }
-          throw new Error(`File '${filename}' not found`);
-        },
-        writeFile: (filename, content) => {
-          const readOnlyFiles = ['background.jpg', 'enwik6', 'index.html'];
-          if (readOnlyFiles.includes(filename)) {
-            throw new Error(`File '${filename}' is read-only and cannot be modified`);
-          }
-          files[filename] = content;
-          addToConsole(`File '${filename}' written successfully`, 'log');
-        },
-        listFiles: () => {
-          return Object.keys(files);
-        }
-      };
-
       try {
-        // Create a function with the user's code
-        const func = new Function('console', 'fs', 'files', 'return (function() { ' + code + ' })()');
-        const result = func(sandboxConsole, fs, files);
+        const func = new Function('console', 'return (function() { ' + code + ' })()');
+        const result = func(sandboxConsole);
 
-        // If there's a return value, show it
         if (result !== undefined) {
-          addToConsole(`Return value: ${typeof result === 'object' ? JSON.stringify(result, null, 2) : result}`, 'log');
+          addToConsole(`Return: ${typeof result === 'object' ? JSON.stringify(result, null, 2) : result}`, 'log');
         }
-
-        addToConsole('Code execution completed', 'log');
       } catch (error) {
         addToConsole(`Error: ${error.message}`, 'error');
-        addToConsole(`Stack: ${error.stack}`, 'error');
       }
     }
 
-    // Event listeners
-    jsEditor.addEventListener('keydown', function (e) {
-      if (e.key === 'Tab') {
-        e.preventDefault();
-        const selection = window.getSelection();
-        const range = selection.getRangeAt(0);
-        const tabNode = document.createTextNode('    ');
-        range.insertNode(tabNode);
-        range.setStartAfter(tabNode);
-        range.setEndAfter(tabNode);
-        selection.removeAllRanges();
-        selection.addRange(range);
+    async function downloadCode() {
+      let code = currentCode;
+      
+      if (editor) {
+        try {
+          const text = await editor.getText();
+          if (text && text.trim()) {
+            code = text;
+          }
+        } catch (e) {
+          console.log('Could not get text from editor:', e);
+        }
       }
-      if (e.ctrlKey && e.key === 'Enter') {
-        runCode();
+
+      if (!code || !code.trim()) {
+        addToConsole('No code to download', 'warn');
+        return;
       }
-    });
 
+      const blob = new Blob([code], { type: 'text/javascript' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'script.js';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      addToConsole('Downloaded script.js', 'log');
+    }
 
+    async function initSpckEditor() {
+      editor = new SpckEditor('#jsEditor');
 
-    // Initialize when page loads
+      try {
+        addToConsole('Connecting to editor...', 'log');
+        
+        await editor.connect({
+          maxTries: 50,
+          interval: 500
+        });
+
+        const defaultCode = 'console.log("Hello from Code Sake!");';
+        currentCode = defaultCode;
+        
+        editor.send({
+          files: [{
+            path: 'script.js',
+            text: defaultCode,
+          }],
+          open: 'script.js'
+        });
+
+        addToConsole('Editor connected!', 'log');
+
+        editor.on({
+          textChange: function(data) {
+            console.log('textChange event:', data);
+            if (data) {
+              if (data.text !== undefined) {
+                currentCode = data.text;
+              } else if (typeof data === 'string') {
+                currentCode = data;
+              }
+            }
+          },
+          fileOpen: function(data) {
+            console.log('fileOpen event:', data);
+            if (data) {
+              if (data.text !== undefined) {
+                currentCode = data.text;
+              } else if (typeof data === 'string') {
+                currentCode = data;
+              }
+            }
+          }
+        });
+
+        addToConsole('Ready! Click Run to execute code.', 'log');
+
+      } catch (error) {
+        addToConsole('Editor connection issue: ' + error.message, 'warn');
+        addToConsole('You can still use the editor, but auto-sync may not work', 'log');
+        console.error('Editor connection error:', error);
+      }
+    }
+
     window.addEventListener('load', function () {
-      console.log('Page loaded, initializing WebGL...');
+      console.log('Page loaded, initializing...');
       initWebGL();
-
-
-
-      // Ensure console output element is ready
-      if (consoleOutput) {
-        // Add some demo content to console
-        setTimeout(() => {
-          addToConsole('JavaScript Editor Ready! Press Ctrl+Enter to run code.', 'log');
-          addToConsole('Try running: console.log("Hello World!");', 'log');
-        }, 1000);
-      } else {
-        console.error('Console output element not found!');
-      }
+      initSpckEditor();
     });
   </script>
 </body>
